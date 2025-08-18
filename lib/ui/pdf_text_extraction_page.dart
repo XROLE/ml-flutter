@@ -47,6 +47,7 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
     final size = MediaQuery.of(context).size;
 
       String? address = Helper().extractAddress(doc);
+      
 
     return Scaffold(
       body: PaddedContainer(

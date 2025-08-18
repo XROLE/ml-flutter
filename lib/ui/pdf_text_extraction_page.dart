@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
 import 'package:ml_flutter/ui/widget/action_button.dart';
 import 'package:ml_flutter/ui/widget/padded_container.dart';
+import 'package:ml_flutter/util/helper.dart';
 import 'package:pdf_text/pdf_text.dart';
 
 class PdfTextExtractionPage extends StatefulWidget {
@@ -29,7 +30,6 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
       File? file = File(result.files.single.path!);
       PDFDoc pdfDoc = await PDFDoc.fromFile(file);
       String extractedText = await pdfDoc.text;
-      print("extractedText =====================> $extractedText");
       setState(() {
         fileName = result.files.single.name;
         pickedFile = file;
@@ -45,6 +45,9 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
+      String? address = Helper().extractAddress(doc);
+
     return Scaffold(
       body: PaddedContainer(
         child: Column(
@@ -53,6 +56,29 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
             Column(
               children: [
                 SizedBox(height: size.height * .1),
+                Column(
+                  children: [
+                    if(address != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Address : ",
+                          style: TextStyle(
+                            fontSize: size.height * 0.017,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          address,
+                          style: TextStyle(fontSize: size.height * 0.017),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: size.height * .015),
+                  ],
+                ),
                 Container(
                   height: size.height * .14,
                   width: size.width,

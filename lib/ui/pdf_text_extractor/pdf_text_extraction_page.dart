@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
-import 'package:ml_flutter/ui/widget/padded_container.dart';
+import 'package:ml_flutter/ui/widgets/padded_container.dart';
 import 'package:ml_flutter/util/helper.dart';
 import 'package:pdf_text/pdf_text.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
-import 'package:ml_flutter/ui/widget/app_text_style.dart';
+import 'package:ml_flutter/ui/widgets/app_text_style.dart';
 
 class ActionButton extends StatelessWidget {
   final String title;

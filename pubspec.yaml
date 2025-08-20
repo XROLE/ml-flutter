@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   file_picker: ^10.3.1
   pdf_text: ^0.5.0
+  another_flushbar: ^1.12.30
 
 dev_dependencies:
   flutter_test:

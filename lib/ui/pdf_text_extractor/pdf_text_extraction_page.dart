@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
-import 'package:ml_flutter/ui/widget/action_button.dart';
 import 'package:ml_flutter/ui/widget/padded_container.dart';
 import 'package:ml_flutter/util/helper.dart';
 import 'package:pdf_text/pdf_text.dart';
@@ -56,7 +55,16 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
           children: [
             Column(
               children: [
-                SizedBox(height: size.height * .1),
+                SizedBox(height: size.height * .06),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: (){
+                      Navigator.pop(context);
+                    }, icon: Icon(Icons.arrow_back)),
+                  ],
+                ),
+                SizedBox(height: size.height * .017),
                 Column(
                   children: [
                     if(address != null)
@@ -146,7 +154,7 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
                     horizontal: size.width * .04,
                     vertical: size.height * .02,
                   ),
-                  height: size.height * .5,
+                  height: size.height * .45,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),

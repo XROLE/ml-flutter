@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ml_flutter/ui/pdf_text_extraction_page.dart';
+import 'package:ml_flutter/ui/pdf_text_extractor/home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: PdfTextExtractionPage(),
+      home: HomePage(),
     );
   }
 }

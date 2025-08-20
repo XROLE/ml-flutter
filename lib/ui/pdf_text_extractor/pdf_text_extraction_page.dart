@@ -1,52 +1,16 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
 import 'package:ml_flutter/ui/widgets/padded_container.dart';
-import 'package:ml_flutter/util/helper.dart';
-import 'package:pdf_text/pdf_text.dart';
 
-class PdfTextExtractionPage extends StatefulWidget {
-  const PdfTextExtractionPage({super.key});
-
-  @override
-  State<PdfTextExtractionPage> createState() => _PdfTextExtractionPageState();
-}
-
-class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
-  File? pickedFile;
-  String? fileName;
-  String doc = "";
-
-  Future<void> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-
-    if (result != null) {
-      File? file = File(result.files.single.path!);
-      PDFDoc pdfDoc = await PDFDoc.fromFile(file);
-      String extractedText = await pdfDoc.text;
-      setState(() {
-        fileName = result.files.single.name;
-        pickedFile = file;
-        doc = extractedText;
-      });
-    } else {
-      setState(() {
-        fileName = null;
-      });
-    }
-  }
+class PdfTextExtractionPage extends StatelessWidget {
+  final String address;
+  final String fileName;
+  final String doc;
+  const PdfTextExtractionPage({required this.address, required this.doc, required this.fileName, super.key});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-      String? address = Helper().extractAddress(doc);
-      
 
     return Scaffold(
       body: PaddedContainer(
@@ -59,33 +23,36 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: (){
-                      Navigator.pop(context);
-                    }, icon: Icon(Icons.arrow_back)),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.arrow_back),
+                    ),
                   ],
                 ),
                 SizedBox(height: size.height * .017),
                 Column(
                   children: [
-                    if(address != null)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Address : ",
-                          style: TextStyle(
-                            fontSize: size.height * 0.017,
-                            fontWeight: FontWeight.w800,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Address : ",
+                            style: TextStyle(
+                              fontSize: size.height * 0.017,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        Text(
-                          address,
-                          style: TextStyle(fontSize: size.height * 0.017),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: size.height * .015),
+                          Expanded(
+                            child: Text(
+                              address,
+                              style: TextStyle(fontSize: size.height * 0.017),
+                            ),
+                          ),
+                        ],
+                      ),
+                    // SizedBox(height: size.height * .015),
                   ],
                 ),
                 Container(
@@ -98,18 +65,7 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
                   child: Column(
                     children: [
                       SizedBox(height: size.height * .03),
-                      pickedFile == null
-                          ? Center(
-                            child: Text(
-                              "No file loaded",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: size.height * .019,
-                              ),
-                            ),
-                          )
-                          : ListTile(
+                     ListTile(
                             leading: Container(
                               height: size.height * .06,
                               width: size.height * .06,
@@ -174,7 +130,6 @@ class _PdfTextExtractionPageState extends State<PdfTextExtractionPage> {
                     ),
                     child: IconButton(
                       onPressed: () async {
-                        await pickFile();
                       },
                       icon: Icon(Icons.add, size: size.height * .06),
                     ),

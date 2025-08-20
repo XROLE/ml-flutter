@@ -1,9 +1,15 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_flutter/constants/app_colors.dart';
 import 'package:ml_flutter/ui/pdf_text_extractor/pdf_text_extraction_page.dart';
 import 'package:ml_flutter/ui/widgets/action_button.dart';
 import 'package:ml_flutter/ui/widgets/custom_text_input';
 import 'package:ml_flutter/ui/widgets/padded_container.dart';
+import 'package:ml_flutter/util/app_flush_bar.dart';
+import 'package:ml_flutter/util/helper.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 List<String> pdfTypes = ["Locked PDF", "Plain PDF"];
 
@@ -15,7 +21,59 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController passwordController = TextEditingController();
+  File? pickedFile;
+  String? fileName;
+  String doc = "";
   String selectedPdfType = pdfTypes[0];
+  String address = "";
+
+  Future<void> pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      File? file = File(result.files.single.path!);
+
+      setState(() {
+        fileName = result.files.single.name;
+        pickedFile = file;
+      });
+    } else {
+      setState(() {
+        fileName = null;
+      });
+    }
+  }
+
+  Future<void> extractDoc({
+    required File file,
+    // required bool isLockedPdf,
+    String? password,
+  }) async {
+    print("Here is the password ==================> $password");
+    final fileBytes = file.readAsBytesSync();
+    // if (isLockedPdf) {
+    final document = PdfDocument(inputBytes: fileBytes, password: password);
+    // } else {
+    // PDFDoc pdfDoc = await PDFDoc.fromFile(file);
+    // String extractedText = await pdfDoc.text;
+    // Loop through all pages and extract text
+    String extractedDoc = "";
+
+    for (int i = 0; i < document.pages.count; i++) {
+      extractedDoc += PdfTextExtractor(document).extractText(startPageIndex: i);
+    }
+
+    String? extractedAddress = Helper().extractAddress(extractedDoc);
+    setState(() {
+      doc = extractedDoc;
+      address = extractedAddress ?? "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -133,33 +191,43 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-SizedBox(height: size.height * .025),
+                SizedBox(height: size.height * .025),
                 Container(
                   width: size.width,
                   padding: EdgeInsets.all(size.width * .05),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black26),
-                    borderRadius: BorderRadius.circular(8)
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
                     children: [
                       Container(
                         padding: EdgeInsets.all(size.height * .025),
                         decoration: BoxDecoration(
-                        color: Colors.blue[300],
-                          borderRadius: BorderRadius.circular(8)
+                          color: Colors.blue[300],
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.file_upload, color: Colors.white,),
+                        child: IconButton(
+                          onPressed: () async {
+                            await pickFile();
+                          },
+                          icon: Icon(Icons.file_upload, color: Colors.white),
+                        ),
                       ),
                       SizedBox(height: size.height * .015),
-                      Text("Upload $selectedPdfType",  style: TextStyle(
-                        fontSize: size.height * .02,
-                      ),)
+                      Text(
+                        "Upload $selectedPdfType",
+                        style: TextStyle(fontSize: size.height * .02),
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(height: size.height * .025),
-                CustomTextInput(icon: Icons.key,)
+                if (selectedPdfType == pdfTypes[0])
+                  CustomTextInput(
+                    icon: Icons.key,
+                    controller: passwordController,
+                  ),
               ],
             ),
 
@@ -170,7 +238,59 @@ SizedBox(height: size.height * .025),
                     border: Border.all(color: AppColors.richBlue),
                     borderRadius: BorderRadius.circular(size.height * .05),
                   ),
-                  child: ActionButton(title: "Extract Address", onTap: () {}),
+                  child: ActionButton(
+                    title: "Extract Address",
+                    onTap: () async {
+                      String password = passwordController.text;
+
+                      if (pickedFile != null) {
+                        if (selectedPdfType == pdfTypes[0]) {
+                          await extractDoc(file: pickedFile!, password: password);
+
+                          if (password.isEmpty) {
+                            AppFlushBar().showError(
+                              message: "Kindly provide Password to continue",
+                              context: context,
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return PdfTextExtractionPage(
+                                    doc: doc,
+                                    fileName: fileName ?? "",
+                                    address: address ?? "",
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        } else {
+                          await extractDoc(file: pickedFile!);
+                          Future.delayed(Duration(seconds: 2), () {});
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return PdfTextExtractionPage(
+                                  doc: doc,
+                                  fileName: fileName ?? "",
+                                  address: address ?? "",
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      } else {
+                        AppFlushBar().showError(
+                          message: "Upload a PDF to continue",
+                          context: context,
+                        );
+                      }
+                    },
+                  ),
                 ),
 
                 SizedBox(height: size.height * .06),
